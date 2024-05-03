@@ -386,7 +386,7 @@ def evaluate_on_D_WIKI(phase, features_kwargs=None,  model_dirname = None):
                                              refs_sents_paths=str(ref_filepaths))
 
 
-            print("SARI: {:.2f}\t D-SARI: {:.2f} \t BLEU: {:.2f} \t FKGL: {:.2f} ".format(scores['sari'], scores['D-sari'], scores['bleu'], scores['fkgl']))
+            print("SARI: {:.2f}\t D-SARI: {:.2f} \t FKGL: {:.2f} \t Rouge-1: {:.2f} \t CSS: {:.2f}".format(scores['sari'], scores['D-sari'], scores['fkgl'], scores['rouge1']))
             # print("{:.2f} \t {:.2f} \t {:.2f} ".format(scores['SARI'], scores['BLEU'], scores['FKGL']))
 
             print("Execution time: --- %s seconds ---" % (time.time() - start_time))
