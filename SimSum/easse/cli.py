@@ -188,6 +188,7 @@ def evaluate_system_output(
             tokenizer=tokenizer,
             lowercase=lowercase,
         )
+
     if "D-sari" in metrics:
         # print(type(orig_sents))
         #print(len(sys_sents))
@@ -237,6 +238,27 @@ def evaluate_system_output(
 
     if "f1_token" in metrics:
         metrics_scores["f1_token"] = corpus_f1_token(sys_sents, refs_sents, tokenizer=tokenizer, lowercase=lowercase)
+
+    if "rouge1" in metrics:
+        ## Rouge-1 score  = F1 score for the corpus
+        metrics_scores["rouge1"] = corpus_f1_token(sys_sents, refs_sents, tokenizer=tokenizer, lowercase=lowercase)
+
+    if "css" in metrics:
+        if "rouge1" not in metrics_scores:
+            rouge1 = corpus_f1_token(sys_sents, refs_sents, tokenizer=tokenizer, lowercase=lowercase)
+        else:
+            rouge1 = metrics_scores["f1_token"]
+        if "sari" not in metrics_scores:
+            sari = metrics_scores["sari"] = corpus_sari(
+                orig_sents,
+                sys_sents,
+                refs_sents,
+                tokenizer=tokenizer,
+                lowercase=lowercase,
+            )
+        else:
+            sari = metrics_scores["sari"]
+        metrics_scores["css"] = 2 * rouge1 * sari / (rouge1 + sari)
 
     if "bertscore" in metrics:
         from easse.bertscore import corpus_bertscore  # Inline import to use EASSE without installing all dependencies
