@@ -23,9 +23,9 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from optuna.integration import PyTorchLightningPruningCallback
 
-#from T5_2 import SumSim, train
+from T5_2 import SumSim, train
 #from Bart2 import SumSim, train
-from Bart_baseline_finetuned import BartBaseLineFineTuned, train
+# from Bart_baseline_finetuned import BartBaseLineFineTuned, train
 #from T5_baseline_finetuned import T5BaseLineFineTuned, train
 
 
@@ -34,8 +34,8 @@ def parse_arguments():
                   
     p.add_argument('--seed', type=int, default=42, help='randomization seed')
 
-    #p = SumSim.add_model_specific_args(p)
-    p = BartBaseLineFineTuned.add_model_specific_args(p)
+    p = SumSim.add_model_specific_args(p)
+    # p = BartBaseLineFineTuned.add_model_specific_args(p)
     #p = T5BaseLineFineTuned.add_model_specific_args(p)
     p = pl.Trainer.add_argparse_args(p)
     args,_ = p.parse_known_args()
@@ -77,7 +77,7 @@ def run_training(args, dataset):
 
 
 
-dataset = WIKI_DOC
+dataset = D_WIKI
 args = parse_arguments()
 run_training(args, dataset)
 
