@@ -53,6 +53,7 @@ PHASES = ['train','valid']
 stopwords = set(stopwords.words('english'))
 
 #######################
+
 def get_tokenizer():
     return MosesTokenizer(lang='en')
 
@@ -335,14 +336,15 @@ class DependencyTreeDepthRatioFeature(RatioFeature):
         return get_spacy_model()(text)
 
 class Preprocessor:
-    def __init__(self, features_kwargs=None):
+    def __init__(self, features_kwargs=None, prompts=None):
         super().__init__()
 
         self.features = self.get_features(features_kwargs)
         if features_kwargs:
             self.hash = generate_hash(str(features_kwargs).encode())
         else:
-            self.hash = "no_feature"
+            self.hash = "no_prompting"
+        self.prompts = prompts
 
     def get_class(self, class_name, *args, **kwargs):
         return globals()[class_name](*args, **kwargs)
@@ -353,6 +355,34 @@ class Preprocessor:
             features.append(self.get_class(feature_name, **kwargs))
         return features
 
+    def keyword_prompted_sent(self, sentence, prompt=['keybert'], score=True):
+        if 'keybert' in prompt:
+            from keybert import KeyBERT
+            kw_model = KeyBERT()
+            keywords = kw_model.extract_keywords(sentence)
+        if 'yake' in prompt:
+            import yake
+            kw_extractor = yake.KeywordExtractor(top=5)
+            keywords = kw_extractor.extract_keywords(sentence)
+        if 'rake' in prompt:
+            from multi_rake import Rake
+            rake = Rake()
+            keywords = rake.apply(sentence)
+        if  'textrank' in prompt:
+            from summa import keywords as kw
+            keywords = kw.keywords(sentence, scores=True)
+            
+        keywords = keywords[:5]
+        sent = ''
+        if score:
+            for word, _score in keywords:
+                sent += str(word) + '_' + str(_score) + ' '
+        else:
+            for word in keywords:
+                sent += str(word) + ' '
+            sent+='<\\s> '
+        return sent+sentence
+
     def encode_sentence(self, sentence):
         if self.features:
             line = ''
@@ -360,8 +390,11 @@ class Preprocessor:
                 line += feature.encode_sentence(sentence) + ' '
             line += ' ' + sentence
             return line.rstrip()
-        else:
-            return sentence
+        
+        if self.prompts:
+            return self.keyword_prompted_sent(sentence, self.prompts, score=True)
+        
+        return sentence
 
     def encode_sentence_pair(self, complex_sentence, simple_sentence):
         # print(complex_sentence)
@@ -376,8 +409,10 @@ class Preprocessor:
             line += ' ' + complex_sentence
             return line.rstrip()
 
-        else:
-            return complex_sentence
+        if self.prompts:
+            return self.keyword_prompted_sent(complex_sentence, self.prompts, score=True)
+        
+        return complex_sentence
 
     def decode_sentence(self, encoded_sentence):
         for feature in self.features:
