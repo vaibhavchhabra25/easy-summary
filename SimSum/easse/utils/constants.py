@@ -62,6 +62,8 @@ VALID_METRICS = [
     'sari_legacy',
     'sari_by_operation',
     'bertscore',
-    'D-sari'
+    'D-sari',
+    'rouge1',
+    'css'
 ]
-DEFAULT_METRICS = ['bleu', 'sari', 'fkgl','D-sari']
+DEFAULT_METRICS = ['sari', 'fkgl','D-sari', 'rouge1', 'css']
