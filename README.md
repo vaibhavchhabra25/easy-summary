@@ -1,8 +1,6 @@
 # Simplification via Simultaneous Summarization
 This repo is the codes for the NLP course project 
 
-![](/fig/WechatIMG14.png)
-
 ## Installation
 Install the required libraries either in the main environment or after making a virtual environment, using
 
